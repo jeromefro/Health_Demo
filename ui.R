@@ -36,7 +36,8 @@ shinyUI(fluidPage(
     ),
     
     mainPanel(tabsetPanel(
-      tabPanel("Map", plotOutput("map", height="400px", width="900px"))
+      tabPanel("Map", plotOutput("map", height="400px", width="900px")), 
+      tabPanel("Table", dataTableOutput("table"))
     ))
     
   )

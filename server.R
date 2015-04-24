@@ -8,7 +8,7 @@ load("./Data/usMap.rda")
 
 shinyServer(
   function(input, output) {
-    updateRates = reactive({
+    getSubset = reactive({
       subset = select_(dat, 
                       .dots = c(input$rate.var, "Leading.Cancer.Sites", "Sex", "State", "Race"))
       subset = filter(subset, 
@@ -16,8 +16,7 @@ shinyServer(
                         Sex == input$sex.var &
                         Race == input$race.var)
       
-      rates = subset[,1][match(usMap$STATE_NAME, subset$State)]
-      return(rates)
+      return(subset)
     })
     
     getCol = reactive({
@@ -31,7 +30,8 @@ shinyServer(
     })
     
     output$map = renderPlot({
-      usMap$rates = updateRates()
+      this.subset = getSubset()
+      usMap$rates = this.subset[,1][match(usMap$STATE_NAME, this.subset$State)]
       this.col = getCol()
       
       p = ggplot(data = usMap, aes(x = x_proj, y = y_proj, group = DRAWSEQ, fill = rates)) + 
@@ -42,6 +42,10 @@ shinyServer(
       
       print(p)
     })
+    
+    output$table = renderDataTable({
+      getSubset()
+    })  
     
   }
 )

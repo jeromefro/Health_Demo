@@ -1,12 +1,12 @@
 {
-    "contents" : "library(shiny)\n\ncancer.choices = as.character(levels(dat$Leading.Cancer.Sites))\nrace.choices = as.character(levels(dat$Race))\nsex.choices = as.character(levels(dat$Sex))\nrate.choices = c(\"Age.Adjusted.Rate\", \"Crude.Rate\")\n\nshinyUI(fluidPage(\n  titlePanel(\"Visualizing Cancer Data\"),\n  \n  sidebarLayout(\n    sidebarPanel(\n      helpText(\"This application was developed to explore cancer rates at the state level.\"),\n      br(),\n      \n      selectInput(\"cancer.var\", \n                  label = \"Choose a type of cancer...\",\n                  choices = cancer.choices,\n                  selected = cancer.choices[1]),\n      \n      radioButtons(\"race.var\", \n                  label = \"Choose a race...\",\n                  choices = race.choices,\n                  selected = race.choices[3]),\t\n      \n      radioButtons(\"sex.var\", \n                   label = \"Choose a gender...\",\n                   choices = sex.choices,\n                   selected = sex.choices[2]),\n      \n      radioButtons(\"rate.var\", \n                   label = \"Choose a rate...\",\n                   choices = rate.choices,\n                   selected = rate.choices[2])\n      \n    ),\n    \n    mainPanel(tabsetPanel(\n      tabPanel(\"Map\", plotOutput(\"map\", height=\"400px\", width=\"900px\"))\n    ))\n    \n  )\n))",
+    "contents" : "library(shiny)\n\ncancer.choices = as.character(levels(dat$Leading.Cancer.Sites))\nrace.choices = as.character(levels(dat$Race))\nsex.choices = as.character(levels(dat$Sex))\nrate.choices = c(\"Age.Adjusted.Rate\", \"Crude.Rate\")\n\nshinyUI(fluidPage(\n  titlePanel(\"Visualizing Cancer Data\"),\n  \n  sidebarLayout(\n    sidebarPanel(\n      helpText(\"This application was developed to explore cancer rates at the state level.\"),\n      br(),\n      \n      selectInput(\"cancer.var\", \n                  label = \"Choose a type of cancer...\",\n                  choices = cancer.choices,\n                  selected = cancer.choices[1]),\n      \n      radioButtons(\"race.var\", \n                  label = \"Choose a race...\",\n                  choices = race.choices,\n                  selected = race.choices[3]),\t\n      \n      radioButtons(\"sex.var\", \n                   label = \"Choose a gender...\",\n                   choices = sex.choices,\n                   selected = sex.choices[2]),\n      \n      radioButtons(\"rate.var\", \n                   label = \"Choose a rate...\",\n                   choices = rate.choices,\n                   selected = rate.choices[2])\n      \n    ),\n    \n    mainPanel(tabsetPanel(\n      tabPanel(\"Map\", plotOutput(\"map\", height=\"400px\", width=\"900px\")), \n      tabPanel(\"Table\", dataTableOutput(\"table\"))\n    ))\n    \n  )\n))",
     "created" : 1429900794506.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3341328097",
+    "hash" : "2395910511",
     "id" : "5222D208",
-    "lastKnownWriteTime" : 1429900383,
+    "lastKnownWriteTime" : 1429907665,
     "path" : "~/Health_Demo/ui.R",
     "project_path" : "ui.R",
     "properties" : {
