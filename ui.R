@@ -12,6 +12,9 @@ shinyUI(fluidPage(
     sidebarPanel(
       helpText("This application was developed to explore cancer rates at the state level."),
       br(),
+      helpText("The data comes from the ", a("CDC", href="http://wonder.cdc.gov/", target="_blank"),
+               " and spans the years 1999 through 2011. Furthermore, the rates cited are per 10,000 people."),
+      br(),
       
       selectInput("cancer.var", 
                   label = "Choose a type of cancer...",
