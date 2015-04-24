@@ -1,0 +1,17 @@
+{
+    "contents" : "library(shinyapps)\nshinyapps::deployApp('C:\\\\Users\\\\576163\\\\Documents\\\\Health_Demo')\n",
+    "created" : 1429900889275.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1769547558",
+    "id" : "595E681C",
+    "lastKnownWriteTime" : 1429901671,
+    "path" : "~/Health_Demo/deploy.R",
+    "project_path" : "deploy.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

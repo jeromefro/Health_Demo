@@ -1,0 +1,17 @@
+{
+    "contents" : "load(\"./Data/dat.rda\")\n",
+    "created" : 1429895236453.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1749105886",
+    "id" : "8F9281CC",
+    "lastKnownWriteTime" : 1429902493,
+    "path" : "~/Health_Demo/global.R",
+    "project_path" : "global.R",
+    "properties" : {
+        "tempName" : "Untitled2"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
