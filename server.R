@@ -34,10 +34,11 @@ shinyServer(
     
     getSubsetLine = reactive({
       subset = dat %>% filter(SITE == input$cancer.var & 
-                                STATE == input$state.var &
+                                STATE %in% input$state.var &
                                 SEX == input$sex.var & 
                                 RACE == input$race.var) %>%
-                        select_(.dots = c(input$rate.var, "YEAR", "EVENT_TYPE"))
+                        select_(.dots = c(input$rate.var, "YEAR", "EVENT_TYPE", "STATE"))
+      names(subset)[1] <- "RATE"
       return(subset)
     })
     
@@ -54,17 +55,21 @@ shinyServer(
         geom_polygon(color = "black",  color = "gray40", size = 0.6) + 
         scale_fill_gradientn(colours=brewer.pal(7, this.col)) +
         theme(axis.line = element_blank(), panel.grid=element_blank(), rect = element_blank(), axis.title=element_blank(), axis.ticks=element_blank(), axis.text=element_blank()) +
-        labs(title = "Title", fill=NULL)
+        labs(title = "Title")
       
       print(p)
     })
     
     output$line = renderPlot({
-      this.subset = getSubsetLine()
-      
-      p = ggplot(data = this.subset, aes(x = YEAR, y = COUNT, by = EVENT_TYPE)) + geom_line()
-      
-      print(p)
+      if (length(input$state.var) > 0) {
+        this.subset = getSubsetLine()
+        
+        p = ggplot(data = this.subset, aes(x = YEAR, y = RATE, color = interaction(STATE, EVENT_TYPE))) + 
+          geom_point(size = 3) + geom_line() +
+          theme(rect = element_blank())
+        
+        print(p)
+      }
     })
     
     output$table = renderDataTable({

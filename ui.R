@@ -45,11 +45,10 @@ shinyUI(fluidPage(
                    choices = rate.choices,
                    selected = rate.choices[1]),
       
-      selectInput("state.var", 
+      selectizeInput("state.var", 
                   label = "Choose a state...",
                   choices = state.choices,
-                  selected = state.choices[1])
-      
+                  multiple = TRUE)
     ),
     
     mainPanel(tabsetPanel(

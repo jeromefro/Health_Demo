@@ -23,13 +23,15 @@ ggplot(data = usMap, aes(x = x_proj, y = y_proj, group = DRAWSEQ, fill = rate)) 
 
 
 subset = dat %>% filter(SITE == "All Cancer Sites Combined" & 
-                          STATE %in% c("New Jersey", "New York") &
+                          STATE %in% c("New Jersey", "New York", "United States") &
                           SEX == "Male" & 
                           RACE == "White") %>%
-                  select_(.dots = c("COUNT", "YEAR", "STATE", "EVENT_TYPE"))
+                  select_(.dots = c("CRUDE_RATE", "YEAR", "STATE", "EVENT_TYPE"))
 
 
-ggplot(data = subset, aes(x = YEAR, y = COUNT, by = EVENT_TYPE)) + geom_line() 
+ggplot(data = subset, aes(x = YEAR, y = CRUDE_RATE, color = interaction(EVENT_TYPE, STATE))) + 
+  geom_point(size = 3) + geom_line() +
+  theme(rect = element_blank()) + labs(title = "Title")
 
 library(rCharts)
 rPlot(COUNT ~ YEAR | STATE, color = 'EVENT_TYPE', type = 'line', data = subset)
