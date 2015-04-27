@@ -1,9 +1,11 @@
 library(shiny)
 
-cancer.choices = as.character(levels(dat$Leading.Cancer.Sites))
-race.choices = as.character(levels(dat$Race))
-sex.choices = as.character(levels(dat$Sex))
-rate.choices = c("Age.Adjusted.Rate", "Crude.Rate")
+cancer.choices = as.character(levels(dat$SITE))
+race.choices = as.character(levels(dat$RACE))
+type.choices = as.character(levels(dat$EVENT_TYPE))
+sex.choices = as.character(levels(dat$SEX))
+rate.choices = c("COUNT", "CRUDE_RATE", "AGE_ADJUSTED_RATE")
+state.choices = as.character(levels(dat$STATE))
 
 shinyUI(fluidPage(
   titlePanel("Visualizing Cancer Data"),
@@ -21,25 +23,38 @@ shinyUI(fluidPage(
                   choices = cancer.choices,
                   selected = cancer.choices[1]),
       
+      sliderInput("year.var", "Year released", 1999, 2011, value = c(1999, 2011)),
+      
       radioButtons("race.var", 
                   label = "Choose a race...",
                   choices = race.choices,
-                  selected = race.choices[3]),	
+                  selected = race.choices[1]),	
       
       radioButtons("sex.var", 
                    label = "Choose a gender...",
                    choices = sex.choices,
-                   selected = sex.choices[2]),
+                   selected = sex.choices[1]),
+      
+      radioButtons("type.var", 
+                   label = "Choose an event type...",
+                   choices = type.choices,
+                   selected = type.choices[1]),
       
       radioButtons("rate.var", 
                    label = "Choose a rate...",
                    choices = rate.choices,
-                   selected = rate.choices[2])
+                   selected = rate.choices[1]),
+      
+      selectInput("state.var", 
+                  label = "Choose a state...",
+                  choices = state.choices,
+                  selected = state.choices[1])
       
     ),
     
     mainPanel(tabsetPanel(
-      tabPanel("Map", plotOutput("map", height="400px", width="900px")), 
+      tabPanel("Map", plotOutput("map", height="400px", width="900px"), 
+               plotOutput("line")),
       tabPanel("Table", dataTableOutput("table"))
     ))
     

@@ -8,33 +8,49 @@ load("./Data/usMap.rda")
 
 shinyServer(
   function(input, output) {
-    getSubset = reactive({
-      subset = select_(dat, 
-                      .dots = c(input$rate.var, "Leading.Cancer.Sites", "Sex", "State", "Race"))
-      subset = filter(subset, 
-                      Leading.Cancer.Sites == input$cancer.var & 
-                        Sex == input$sex.var &
-                        Race == input$race.var)
-      
-      return(subset)
-    })
-    
     getCol = reactive({
-      if(input$race.var == "Asian or Pacific Islander"){
+      if (input$race.var == "All Races") {
+        return("YlOrRd")
+      } else if (input$race.var == "Asian/Pacific Islander"){
         return("Greens")
-      } else if(input$race.var == "Black or African American"){
+      } else if (input$race.var == "Black"){
         return("Reds")
-      } else {
+      } else if (input$race.var == "White"){
         return("Blues")
+      } else {
+        return ("Oranges")
       }
     })
     
+    getSubsetPlot = reactive({
+      subset = dat %>% filter(SITE == input$cancer.var & 
+                                EVENT_TYPE == input$type.var &
+                                STATE != "United States" &
+                                SEX == input$sex.var & 
+                                RACE == input$race.var & 
+                                (YEAR >= input$year.var[1] & YEAR <= input$year.var[2]))
+      return(subset)
+    })
+    
+    getSubsetLine = reactive({
+      subset = dat %>% filter(SITE == input$cancer.var & 
+                                STATE == input$state.var &
+                                SEX == input$sex.var & 
+                                RACE == input$race.var) %>%
+                        select_(.dots = c(input$rate.var, "YEAR", "EVENT_TYPE"))
+      return(subset)
+    })
+    
+      
     output$map = renderPlot({
-      this.subset = getSubset()
-      usMap$rates = this.subset[,1][match(usMap$STATE_NAME, this.subset$State)]
       this.col = getCol()
       
-      p = ggplot(data = usMap, aes(x = x_proj, y = y_proj, group = DRAWSEQ, fill = rates)) + 
+      this.subset = getSubsetPlot() %>% select_(.dots = c(input$rate.var, "STATE"))
+      
+      
+      usMap$rate = this.subset[,1][match(usMap$STATE_NAME, this.subset$STATE)]
+      
+      p = ggplot(data = usMap, aes(x = x_proj, y = y_proj, group = DRAWSEQ, fill = rate)) + 
         geom_polygon(color = "black",  color = "gray40", size = 0.6) + 
         scale_fill_gradientn(colours=brewer.pal(7, this.col)) +
         theme(axis.line = element_blank(), panel.grid=element_blank(), rect = element_blank(), axis.title=element_blank(), axis.ticks=element_blank(), axis.text=element_blank()) +
@@ -43,9 +59,17 @@ shinyServer(
       print(p)
     })
     
+    output$line = renderPlot({
+      this.subset = getSubsetLine()
+      
+      p = ggplot(data = this.subset, aes(x = YEAR, y = COUNT, by = EVENT_TYPE)) + geom_line()
+      
+      print(p)
+    })
+    
     output$table = renderDataTable({
-      getSubset()
-    })  
+      dat
+    })
     
   }
 )
