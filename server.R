@@ -35,6 +35,7 @@ shinyServer(
     getSubsetLine = reactive({
       subset = dat %>% filter(SITE == input$cancer.var & 
                                 STATE %in% input$state.var &
+                                EVENT_TYPE == input$type.var &
                                 SEX == input$sex.var & 
                                 RACE == input$race.var) %>%
                         select_(.dots = c(input$rate.var, "YEAR", "EVENT_TYPE", "STATE"))
@@ -64,17 +65,27 @@ shinyServer(
       if (length(input$state.var) > 0) {
         this.subset = getSubsetLine()
         
-        p = ggplot(data = this.subset, aes(x = YEAR, y = RATE, color = interaction(STATE, EVENT_TYPE))) + 
+        p = ggplot(data = this.subset, aes(x = YEAR, y = RATE, color = STATE)) + 
           geom_point(size = 3) + geom_line() +
-          theme(rect = element_blank())
+          theme(rect = element_blank()) + 
+          labs(title = "Title")
         
         print(p)
       }
     })
     
     output$table = renderDataTable({
-      dat
+      getSubsetPLot()
     })
+    
+    output$downloadData <- downloadHandler(
+      filename = function() { 
+        paste("cancerData", '.csv', sep='') 
+      },
+      content = function(file) {
+        write.csv(getSubsetPlot(), file)
+      }
+    )
     
   }
 )
