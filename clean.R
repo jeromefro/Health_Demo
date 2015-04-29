@@ -63,3 +63,14 @@ head(all_us)
 usMap <- select(all_us, DRAWSEQ, STATE_NAME, x_proj, y_proj)
 str(usMap)
 save(usMap, file=".\\Data\\usMap.rda")
+
+
+
+
+
+# url: http://catalog.data.gov/dataset/community-health-status-indicators-chsi-to-combat-obesity-heart-disease-and-cancer
+
+df <- read.csv("./CHSI/DEMOGRAPHICS.csv")
+head(df)
+str(df)
+library(dplyr)

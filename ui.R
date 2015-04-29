@@ -51,29 +51,36 @@ shinyUI(navbarPage("Booz | Allen | Hamilton",
       ),
       
         wellPanel(
-          h3("Variation over Time"),
-          br(),
+          h3("Download Map of USA"),
+          downloadButton('downloadMap', 'Download')
+        ),      
+      
+        wellPanel(
+          h3("Plots of Data"),
+          
+          selectInput("plot_type", "Choose a type of plot...",
+                      c("Line Graph", "Bar Chart")
+          ),
           
           selectizeInput("state.var", 
                          label = "Choose a state...",
                          choices = state.choices,
+                         selected = state.choices[1],
                          multiple = TRUE),
-          br()
+         
+          uiOutput("ui")
         ),
       
         wellPanel(
-          h3("Download Selected Data"),
-          br(),
-          downloadButton('downloadData', 'Download'),  
-          br()
+          h3("Download Plot"),
+          downloadButton('downloadPlot', 'Download')
         )
-      
       ),
     
       column(9, 
           tabsetPanel(
             tabPanel("Map", plotOutput("map", height="600px", width="1000px"), 
-                   plotOutput("line")),
+                   plotOutput("plot")),
             tabPanel("Table", dataTableOutput("table"))
         )
       )
@@ -81,6 +88,47 @@ shinyUI(navbarPage("Booz | Allen | Hamilton",
   ),
   
   tabPanel("County"),
+  
+  tabPanel("Upload", 
+           shinyUI(fluidPage(
+             fluidRow(
+                 column(3,
+                  wellPanel(      
+                   fileInput('file1', 'Choose file to upload',
+                             accept = c(
+                               'text/csv',
+                               'text/comma-separated-values',
+                               'text/tab-separated-values',
+                               'text/plain',
+                               '.csv',
+                               '.tsv'
+                             )
+                   ),
+                   tags$hr(),
+                   checkboxInput('header', 'Header', TRUE),
+                   radioButtons('sep', 'Separator',
+                                c(Comma=',',
+                                  Semicolon=';',
+                                  Tab='\t'),
+                                ','),
+                   radioButtons('quote', 'Quote',
+                                c(None='',
+                                  'Double Quote'='"',
+                                  'Single Quote'="'"),
+                                '"')
+                 )
+                ),
+               
+               column(9, 
+                  tabsetPanel(type = "tabs", 
+                              tabPanel("Pre-Processing", tableOutput('contents')), 
+                              tabPanel("Explore"), 
+                              tabPanel("Predict")
+                  )    
+               )
+             )
+           ))       
+  ),
   
   navbarMenu("More", 
     tabPanel("About"),

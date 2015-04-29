@@ -43,8 +43,19 @@ shinyServer(
       return(subset)
     })
     
-      
-    output$map = renderPlot({
+    getSubsetBar = reactive({
+      subset = dat %>% filter(SITE != "All Cancer Sites Combined" & 
+                                STATE %in% input$state.var &
+                                EVENT_TYPE == input$type.var &
+                                SEX == input$sex.var & 
+                                RACE == input$race.var &
+                                YEAR == input$dynamic.var) %>%
+        select_(.dots = c(input$rate.var, "SITE", "STATE"))
+      names(subset)[1] <- "RATE"
+      return(subset)
+    })
+    
+    getMap = reactive({
       this.col = getCol()
       
       this.subset = getSubsetPlot() %>% select_(.dots = c(input$rate.var, "STATE"))
@@ -58,34 +69,90 @@ shinyServer(
         theme(axis.line = element_blank(), panel.grid=element_blank(), rect = element_blank(), axis.title=element_blank(), axis.ticks=element_blank(), axis.text=element_blank()) +
         labs(title = "Title")
       
+      return(p)
+    })
+    
+    getPlot = reactive({
+        if (input$plot_type == "Line Graph") {
+          this.subset = getSubsetLine()
+          
+          p = ggplot(data = this.subset, aes(x = YEAR, y = RATE, color = STATE)) + 
+            geom_point(size = 3) + geom_line() +
+            theme(rect = element_blank()) + 
+            labs(title = "Title")
+          
+          return(p)
+        }
+      
+      else {
+        this.subset = getSubsetBar()
+        
+        p = ggplot(data = this.subset, aes(x = SITE, y = RATE, fill = SITE)) + 
+          geom_bar(stat = "identity") +
+          theme(rect = element_blank()) + labs(title = "Title") + facet_wrap(~ STATE)
+        
+        return(p)
+      }
+      
+    })
+    
+      
+    output$map = renderPlot({
+      p = getMap()
       print(p)
     })
     
-    output$line = renderPlot({
-      if (length(input$state.var) > 0) {
-        this.subset = getSubsetLine()
-        
-        p = ggplot(data = this.subset, aes(x = YEAR, y = RATE, color = STATE)) + 
-          geom_point(size = 3) + geom_line() +
-          theme(rect = element_blank()) + 
-          labs(title = "Title")
-        
-        print(p)
-      }
+    output$downloadMap <- downloadHandler(
+      filename = 'map.png',
+      content = function(file) {
+        device <- function(..., width, height) {
+          grDevices::png(..., width = width, height = height,
+                         res = 300, units = "in")
+        }
+        ggsave(file, plot = getMap(), device = device)
+      })
+    
+    output$ui <- renderUI({
+      if (is.null(input$plot_type))
+        return()
+      
+      switch(input$plot_type,
+             "Line Graph" = return(),
+             "Bar Chart" = selectInput("dynamic.var", label = h3("Choose a year..."), 
+                                       choices = 1999:2011, 
+                                       selected = 2011),
+      )
     })
+    
+    output$plot = renderPlot({
+        p = getPlot()
+        print(p)
+    })
+    
+    output$downloadMap <- downloadHandler(
+      filename = 'plot.png',
+      content = function(file) {
+        device <- function(..., width, height) {
+          grDevices::png(..., width = width, height = height,
+                         res = 300, units = "in")
+        }
+        ggsave(file, plot = getMap(), device = device)
+      })
     
     output$table = renderDataTable({
       getSubsetPLot()
     })
     
-    output$downloadData <- downloadHandler(
-      filename = function() { 
-        paste("cancerData", '.csv', sep='') 
-      },
-      content = function(file) {
-        write.csv(getSubsetPlot(), file)
-      }
-    )
+    
+    output$contents <- renderTable({
+      inFile <- input$file1
+      
+      if (is.null(inFile))
+        return(NULL)
+      
+      read.csv(inFile$datapath, header = input$header,
+               sep = input$sep, quote = input$quote)
+    })
     
   }
 )
