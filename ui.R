@@ -110,18 +110,36 @@ shinyUI(navbarPage("Booz | Allen | Hamilton",
                                 c(Comma=',',
                                   Semicolon=';',
                                   Tab='\t'),
-                                ','),
-                   radioButtons('quote', 'Quote',
-                                c(None='',
-                                  'Double Quote'='"',
-                                  'Single Quote'="'"),
-                                '"')
+                                ',')
                  )
                 ),
                
                column(9, 
                   tabsetPanel(type = "tabs", 
-                              tabPanel("Pre-Processing", tableOutput('contents')), 
+                              tabPanel("Overview",
+                                fluidRow(
+                                  column(3,
+                                    wellPanel(htmlOutput("dataText"))
+                                  ),
+                                  column(9,
+                                    dataTableOutput('contents')
+                                  )
+                                )
+                              ),
+                              tabPanel("Summary", fluidRow(
+                                column(12,
+                                       tableOutput("summary"))
+                                )),
+                              tabPanel("Pre-Processing", 
+                                       sidebarLayout(
+                                         sidebarPanel(
+                                           h6("Controls for pre-processing")
+                                         ),                                       
+                                         mainPanel(
+                                           
+                                         )
+                                       )
+                              ),
                               tabPanel("Explore"), 
                               tabPanel("Predict")
                   )    

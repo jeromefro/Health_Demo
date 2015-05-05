@@ -140,18 +140,32 @@ shinyServer(
       })
     
     output$table = renderDataTable({
-      getSubsetPLot()
+      getSubsetPlot()
     })
     
-    
-    output$contents <- renderTable({
+    userData <- reactive({
       inFile <- input$file1
       
       if (is.null(inFile))
         return(NULL)
       
       read.csv(inFile$datapath, header = input$header,
-               sep = input$sep, quote = input$quote)
+               sep = input$sep)
+    })
+    
+    output$contents = renderDataTable({
+      userData()
+    })
+    
+    output$dataText = renderUI({
+      str1 = paste("Size of Dataset: ", format(object.size(userData()), units = "Kb"))
+      str2 = paste("Number of Observations: ", dim(userData())[1])
+      str3 = paste("Number of Features: ", dim(userData())[2])
+      HTML(paste(str1, str2, str3, sep = '<br/>'))
+    })
+    
+    output$summary = renderTable({
+      summary(userData())
     })
     
   }
