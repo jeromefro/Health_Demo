@@ -3,8 +3,10 @@ library(dplyr)
 library(ggplot2)
 library(gridExtra)
 library(RColorBrewer)
+library(maps)
 
 load("./Data/usMap.rda")
+load("./Data/dfState.rda")
 
 shinyServer(
   function(input, output) {
@@ -64,7 +66,7 @@ shinyServer(
       usMap$rate = this.subset[,1][match(usMap$STATE_NAME, this.subset$STATE)]
       
       p = ggplot(data = usMap, aes(x = x_proj, y = y_proj, group = DRAWSEQ, fill = rate)) + 
-        geom_polygon(color = "black",  color = "gray40", size = 0.6) + 
+        geom_polygon(color = "black", size = 0.6) + 
         scale_fill_gradientn(colours=brewer.pal(7, this.col)) +
         theme(axis.line = element_blank(), panel.grid=element_blank(), rect = element_blank(), axis.title=element_blank(), axis.ticks=element_blank(), axis.text=element_blank()) +
         labs(title = "Title")
@@ -82,9 +84,7 @@ shinyServer(
             labs(title = "Title")
           
           return(p)
-        }
-      
-      else {
+        } else {
         this.subset = getSubsetBar()
         
         p = ggplot(data = this.subset, aes(x = SITE, y = RATE, fill = SITE)) + 
@@ -138,6 +138,49 @@ shinyServer(
         }
         ggsave(file, plot = getMap(), device = device)
       })
+    
+    getSubsetRegression = reactive({
+      s1 = dat %>% filter(YEAR == 2011 & STATE != "United States" & 
+                                SITE == input$regression.site &
+                                EVENT_TYPE == input$regression.event) %>%
+                        select_(.dots = c(input$regression.dependent, "STATE", "RACE", "SEX"))
+      
+      if (input$regression.factor == 1) {
+        s1 = s1 %>% filter(RACE == "All Races" & SEX == "Male and Female") %>%
+          select_(.dots = c(input$regression.dependent, "STATE"))
+      } else if (input$regression.factor == 2) {
+        s1 = s1 %>% filter(RACE != "All Races" & SEX == "Male and Female") %>%
+          select_(.dots = c(input$regression.dependent, "RACE", "STATE"))
+      } else {
+        s1 = s1 %>% filter(RACE == "All Races" & SEX != "Male and Female") %>%
+          select_(.dots = c(input$regression.dependent, "SEX", "STATE"))
+      }
+      
+      s2 = dfState %>% select_(.dots = c(input$regression.independent, "STATE"))
+      
+      s <- merge(s1, s2, by = "STATE")
+      return(s)
+      
+    })
+    
+    output$regressionPlot = renderPlot({
+      
+      reg.subset <- getSubsetRegression()
+      
+      if (input$regression.factor == 1) {
+        p = ggplot(data = reg.subset, aes_string(x = input$regression.independent, y = input$regression.dependent)) +
+          stat_smooth(method = "lm") + geom_point() 
+      } else if (input$regression.factor == 2) {
+        p = ggplot(data = reg.subset, aes_string(x = input$regression.independent, y = input$regression.dependent, color="RACE")) +
+          stat_smooth(method = "lm") + geom_point() 
+      } else {
+        p = ggplot(data = reg.subset, aes_string(x = input$regression.independent, y = input$regression.dependent, color="SEX")) +
+          stat_smooth(method = "lm") + geom_point() 
+      }
+       
+       print(p)
+      
+    })
     
     output$table = renderDataTable({
       getSubsetPlot()
