@@ -13,44 +13,10 @@ shinyUI(navbarPage("Booz | Allen | Hamilton", theme = shinytheme("cosmo"),
   tabPanel("Analysis",
     titlePanel("Visualizing Cancer Data"),
     
-    fluidRow(
-      column(3,
-        br(),
-        br(),
-        wellPanel(
-          selectInput("dataset_choice", "Choose a dataset...",
-                      c("State", "County")
-          ),
-          br()
-      ),
-      
-        wellPanel(
-          h3("Plots of Data"),
-          
-          selectInput("plot_type", "Choose a type of plot...",
-                      c("Line Graph", "Bar Chart")
-          ),
-          
-          selectizeInput("state.var", 
-                         label = "Choose a state...",
-                         choices = state.choices,
-                         selected = state.choices[1],
-                         multiple = TRUE),
-         
-          uiOutput("ui")
-        ),
-      
-      wellPanel(
-        h3("Download Map of USA"),
-        downloadButton('downloadMap', 'Download')
-      ),
-      
-        wellPanel(
-          h3("Download Plot"),
-          downloadButton('downloadPlot', 'Download')
-        )
-      ),
-        column(9,  
+    h4("Choose a Dataset"),
+    
+    navlistPanel(widths = c(2,10), tabPanel(("State"), fluidRow(
+      column(12,  
         tabsetPanel(
             tabPanel("Map",
                      fluidPage(
@@ -99,8 +65,47 @@ shinyUI(navbarPage("Booz | Allen | Hamilton", theme = shinytheme("cosmo"),
                      )
                     ),
                       
-                   plotOutput("map",  height="600px", width="1000px"),
-                   plotOutput("plot"))),
+                   fluidRow(plotOutput("map",  height="600px", width="1000px")),
+                   fluidRow(
+                     column(3,
+                            wellPanel(
+                              h3("Plots of Data"),
+                              
+                              selectInput("plot_type", "Choose a type of plot...",
+                                          c("Line Graph", "Bar Chart")
+                              ),
+                              
+                              selectizeInput("state.var", 
+                                             label = "Choose a state...",
+                                             choices = state.choices,
+                                             selected = state.choices[1],
+                                             multiple = TRUE),
+                              
+                              uiOutput("ui")
+                            )
+                      ),
+                     
+                     column(9, 
+                            plotOutput("plot")
+                     )
+                   ),
+                   br(),
+                   fluidRow(
+                     column(6,
+                       wellPanel(
+                         h3("Download Map of USA"),
+                         downloadButton('downloadMap', 'Download')
+                       )
+                     ),
+                      column(6, 
+                       wellPanel(
+                         h3("Download Plot"),
+                         downloadButton('downloadPlot', 'Download')
+                       )
+                     ) 
+                   )
+                )
+            ),
             
             tabPanel("Regression", 
               fluidPage(
@@ -153,6 +158,12 @@ shinyUI(navbarPage("Booz | Allen | Hamilton", theme = shinytheme("cosmo"),
             )
           )
         )
+    )),
+    
+    tabPanel("County"
+             
+    )
+    
     )
   ),
   
